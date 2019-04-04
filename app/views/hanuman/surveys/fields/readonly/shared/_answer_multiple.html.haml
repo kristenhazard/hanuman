@@ -1,4 +1,4 @@
-%p.form-control-static.multiselect{multiselectarray: o.observation_answers.map{|oa| oa.answer_choice.formatted_answer_choice}}
+%p.form-control-static.multiselect{multiselectarray: o.observation_answers.map{|oa| (oa.answer_choice.present? ?oa.answer_choice.formatted_answer_choice : "")}}
   - o.observation_answers.includes(:answer_choice).order("hanuman_answer_choices.option_text").each do |oa| 
     - unless oa.answer_choice.blank?
       = oa.answer_choice.formatted_answer_choice
