@@ -142,6 +142,15 @@ module Hanuman
       self.single_cloning = true
       new_q = self.amoeba_dup
       new_q.sort_order = self.sort_order.to_i
+
+      new_q.single_cloning = true
+      new_q.layout_section = nil
+      new_q.layout_row = nil
+      new_q.layout_column = nil
+      new_q.layout_column_position = nil
+      new_q.db_column_name = nil
+      new_q.api_column_name = nil
+
       new_q.save
       # Associate the conditions from the rule
       self.rules.each do |rule|
@@ -178,6 +187,13 @@ module Hanuman
       # and then set the condtions to new rule id
       new_section_q = section_q.amoeba_dup
       new_section_q.sort_order = new_section_q.sort_order + increment_sort_by
+      new_section_q.single_cloning = true
+      new_section_q.layout_section = nil
+      new_section_q.layout_row = nil
+      new_section_q.layout_column = nil
+      new_section_q.layout_column_position = nil
+      new_section_q.db_column_name = nil
+      new_section_q.api_column_name = nil
       new_section_q.save
       descendants_qs.each do |q|
         new_child_q = q.dup_and_save
@@ -314,8 +330,11 @@ module Hanuman
     end
 
     def set_column_names!
-      self.db_column_name = column_name if self.db_column_name.blank?
-      self.api_column_name = column_name if self.api_column_name.blank?
+      self.db_column_name = column_name if self.db_column_name.blank? && !self.single_cloning
+      self.api_column_name = column_name if self.api_column_name.blank? && !self.single_cloning
+
+      self.single_cloning = false if self.single_cloning
+
       save
     end 
 
