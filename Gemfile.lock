@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hanuman (2.1.0)
+    hanuman (2.1.2)
       active_model_serializers (~> 0.8.1)
       acts-as-taggable-on (~> 4.0.0)
       amoeba (~> 3.1.0)
@@ -68,8 +68,8 @@ GEM
       activerecord (>= 4.0)
     amoeba (3.1.0)
       activerecord (>= 3.2.6)
-    ancestry (3.0.7)
-      activerecord (>= 3.2.0)
+    ancestry (3.1.0)
+      activerecord (>= 4.2.0)
     arel (6.0.4)
     ast (2.4.1)
     aws_cf_signer (0.1.3)
