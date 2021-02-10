@@ -9,6 +9,7 @@ addTexareaForUpload = (file, data, idx, $previewContainer) ->
     nameAttr = data.cloudinaryField.replace(/\[observation_photos_attributes]\[\d+]\[photo]/, "[observation_photos_attributes][" + idx + "][description]")
     orderNameAttr = data.cloudinaryField.replace(/\[observation_photos_attributes]\[\d+]\[photo]/, "[observation_photos_attributes][" + idx + "][sort_order]")
     hiddenNameAttr = data.cloudinaryField.replace(/\[observation_photos_attributes]\[\d+]\[photo]/, "[observation_photos_attributes][" + idx + "][photo]")
+    rotationNameAttr = data.cloudinaryField.replace(/\[observation_photos_attributes]\[\d+]\[photo]/, "[observation_photos_attributes][" + idx + "][rotation]")
   else if file == "document"
     regex = /\[observation_documents_attributes]\[\d+]\[document]/
     nameAttr = data.cloudinaryField.replace(/\[observation_documents_attributes]\[\d+]\[document]/, "[observation_documents_attributes][" + idx + "][description]")
@@ -38,6 +39,20 @@ addTexareaForUpload = (file, data, idx, $previewContainer) ->
     $previewContainer.find("."+file+"-preview").last().find('.upload-file-name').after "<p><a id="+file+" class='btn btn-danger remove-upload' style='font-size: .8em;' href='#'>Remove "+file+"</a></p>"
     $previewContainer.find("."+file+"-preview").last().append "<input class='"+file+"-hidden-input' value="+fileValue+" type='hidden'  name="+hiddenNameAttr+">"
     $previewContainer.find("."+file+"-preview").last().append "<br>"
+
+  else if file == "photo"
+    $previewContainer.find("."+file+"-preview").last().append "<p class='upload-file-name'>"+file_id+"</p>"
+    $previewContainer.find("."+file+"-preview").last().append "<label>Description</label><br>"
+    $previewContainer.find("."+file+"-preview").last().append "<textarea rows=2 cols=55 style='margin:0px 0 20px 0;' placeholder='Add "+file+" description here...' name="+nameAttr+"></textarea><br>"
+    $previewContainer.find("."+file+"-preview").last().append "<label>Sort Order</label>"
+    $previewContainer.find("."+file+"-preview").last().append("<p><input class='upload-sort-order' type='number' value='' name="+orderNameAttr+"></input></p>")
+    $previewContainer.find("."+file+"-preview").last().find('.upload-file-name').after "<p class='photo-actions-container'><a id="+file+" class='btn btn-danger remove-upload' style='font-size: .8em;' href='#'>Remove "+file+"</a>" + '<a class="btn btn-success rotate-button" style="font-size: .8em; cursor: pointer;">Rotate Left</a>' + '<a class="btn btn-success rotate-button" style="font-size: .8em; cursor: pointer;">Rotate Right</a></p>'
+    $previewContainer.find("."+file+"-preview").last().append "<input class='"+file+"-hidden-input' value="+fileValue+" type='hidden'  name="+hiddenNameAttr+">"
+    $previewContainer.find("."+file+"-preview").last().append "<br>"
+    $previewContainer.find("."+file+"-preview").last().append "<hr>"
+    $previewContainer.find("."+file+"-preview").last().find('.photo-actions-container').append("<input class='rotation-input' type='hidden' name='" + rotationNameAttr + "'>")
+    
+    bindPhotoRotation()
 
   else
     $previewContainer.find("."+file+"-preview").last().append "<p class='upload-file-name'>"+file_id+"</p>"
@@ -86,7 +101,7 @@ addTexareaForUpload = (file, data, idx, $previewContainer) ->
 
 
     $photoPreviewContainer = $(e.target).siblings('.photo-preview-container')
-    $photoPreviewContainer.append "<div class='photo-preview'>" + $.cloudinary.image(data.result.public_id, format: data.result.format, version: data.result.version, crop: 'fill', width: 350).prop('outerHTML') + "</div>"
+    $photoPreviewContainer.append "<div class='photo-preview'><div class='img-rotate-container'>" + $.cloudinary.image(data.result.public_id, format: data.result.format, version: data.result.version, crop: 'fill', width: 350).prop('outerHTML') + "</div></div>"
     addTexareaForUpload("photo", data, photoIdx, $photoPreviewContainer)
 
   # handle errors
@@ -233,6 +248,48 @@ removeFileHiddenInput = ->
     if !$(e).next().is(":visible")
       $(e).next().remove()
 
+bindPhotoRotation = ->
+  $('.rotate-button').click ->
+    $imgContainer = $(this).closest('div').find('.img-rotate-container')
+    $img = $(this).closest("div").find('img')
+
+    # If the image is wider than it is high, grow the image container so that it doesn't get cut off vertically when rotated
+    heightVal = $img.height()
+    widthVal = $img.width()
+    if widthVal > heightVal
+      $imgContainer.css('height': widthVal)
+
+    # Get the current rotation and update it based on the button click
+    # Reset rotation value if it goes over 360 or below zero
+    currentRotation = $img.data('current-rotation')
+
+    if currentRotation == undefined || currentRotation == null
+      currentRotation = 0
+
+    if $(this).text() == "Rotate Right"
+      currentRotation += 90
+      currentRotation = 0 if currentRotation >= 360
+    else
+      currentRotation -= 90
+      currentRotation += 360 if currentRotation < 0
+
+    $img.data('current-rotation', currentRotation)
+
+    # Transform the image based on the rotation value
+    $imgContainer.removeClass('rotate90 rotate180 rotate270')
+    if currentRotation == 90 || currentRotation == 180 || currentRotation == 270
+      $imgContainer.addClass("rotate" + currentRotation)
+
+    # Update the form with the underlying rotation from the original image
+    absoluteRotation = $(this).closest('div').find('input.rotation-input').data('original-rotation')
+
+    if absoluteRotation == undefined || absoluteRotation == null
+      absoluteRotation = 0
+
+    absoluteRotation = absoluteRotation + currentRotation
+    absoluteRotation = absoluteRotation - 360 if absoluteRotation >= 360
+
+    $(this).closest('div').find('input.rotation-input').val(absoluteRotation)
 
 checkMaxPhotos = (self, maxPhotos, addedPhotos) ->
   if addedPhotos > maxPhotos
@@ -373,12 +430,16 @@ $ ->
   # unbind
   $.cleanData( $('input.cloudinary-fileupload[type=file]') )
 
+
+
+
+
   # rebind cloudinary
   if $.fn.cloudinary_fileupload != undefined
     $('input.cloudinary-fileupload[type=file]').cloudinary_fileupload()
-
   # rebind our custom code
   bindPhotoUploads()
+  bindPhotoRotation()
   bindVideoUploads()
   bindDocumentUploads()
   bindSignatureUploads()

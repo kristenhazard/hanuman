@@ -9,8 +9,8 @@
         %br
         %br
       - else
-        = link_to cl_image_tag(p.photo, :crop => :fill, :width => 350, :sign_url => true), cloudinary_url(p.photo, :sign_url => true), html_options = {"data-gallery" => "", class: "gallery-item gallery-photo", id: "photo_" + p.id.to_s, :"data-content-type" => p.photo.resource_type, :"data-download-url" => cloudinary_url(p.photo, :sign_url => true), :"data-file-name" => p.photo.public_id}
-        = link_to p.photo.my_public_id + "." + p.photo.format + " | download file", cloudinary_url(p.photo, attachment: true, :sign_url => true), html_options = { download: true }
+        = link_to cl_image_tag(p.photo, :crop => :fill, :width => 350, :sign_url => true, angle: p.rotation), cloudinary_url(p.photo, :sign_url => true, angle: p.rotation), html_options = {"data-gallery" => "", class: "gallery-item gallery-photo", id: "photo_" + p.id.to_s, :"data-content-type" => p.photo.resource_type, :"data-download-url" => cloudinary_url(p.photo, :sign_url => true, angle: p.rotation), :"data-file-name" => p.photo.public_id}
+        = link_to p.photo.my_public_id + "." + p.photo.format + " | download file", cloudinary_url(p.photo, attachment: true, :sign_url => true, angle: p.rotation), html_options = { download: true }
         %br
         %br
       %label

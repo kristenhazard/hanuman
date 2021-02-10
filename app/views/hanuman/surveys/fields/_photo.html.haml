@@ -15,12 +15,16 @@
               %p
                 = p.photo.my_public_id + "." + p.photo.format + " | this photo failed to upload successfully, please retry upload or remove"
             - else
-              = link_to cl_image_tag(p.photo, :crop => :fill, :width => 350, :sign_url => true), cloudinary_url(p.photo, :sign_url => true), html_options = {"data-gallery" => "", class: "gallery-item gallery-photo", id: "photo_" + p.id.to_s, :"data-content-type" => p.photo.resource_type, :"data-download-url" => cloudinary_url(p.photo, :sign_url => true), :"data-file-name" => p.photo.public_id}
+              .img-rotate-container
+                = link_to cl_image_tag(p.photo, :crop => :fill, :width => 350, :sign_url => true, angle: p.rotation, class: 'img-rotate'), cloudinary_url(p.photo, :sign_url => true, angle: p.rotation), html_options = {"data-gallery" => "", class: "gallery-item gallery-photo", id: "photo_" + p.id.to_s, :"data-content-type" => p.photo.resource_type, :"data-download-url" => cloudinary_url(p.photo, :sign_url => true, angle: p.rotation), :"data-file-name" => p.photo.public_id}
               %p
-                = link_to p.photo.my_public_id + "." + p.photo.format + " | download file", cloudinary_url(p.photo, attachment: true, :sign_url => true), html_options = { download: true }
+                = link_to p.photo.my_public_id + "." + p.photo.format + " | download file", cloudinary_url(p.photo, attachment: true, :sign_url => true, angle: p.rotation), html_options = { download: true }
             %p.delete-box
               = fff.check_box :_destroy, class:"hidden delete-checkbox"
               %a{class:"btn btn-danger delete-saved-file", style:'font-size: .8em;', href:"#"}Remove photo
+              %a.btn.btn-success.rotate-button{ style:'font-size: .8em; cursor: pointer;' } Rotate Left
+              %a.btn.btn-success.rotate-button{ style:'font-size: .8em; cursor: pointer;' } Rotate Right
+              = fff.hidden_field :rotation, class: 'rotation-input', "data-original-rotation": p.rotation
             = fff.label :"Photo description"
             .form-group
               .col-sm-7
