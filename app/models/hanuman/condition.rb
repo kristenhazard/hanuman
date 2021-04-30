@@ -27,6 +27,7 @@ module Hanuman
 
     amoeba do
       enable
+      exclude_associations :deltas
     end
 
     # when a condition gets deleted, check to see of the rule attached to that condition has other conditions attached to it

@@ -8,6 +8,11 @@ module Hanuman
     belongs_to  :answer_choice
     belongs_to  :multiselectable, polymorphic: true
 
+    amoeba do
+      nullify :uuid
+      nullify :observation_uuid
+    end
+
     def answer_choice_text
       if answer_choice.present?
         answer_choice.option_text

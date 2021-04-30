@@ -20,6 +20,7 @@ module Hanuman
     amoeba do
       propagate
       exclude_association :conditions
+      exclude_association :deltas
       customize(lambda { |original_rule, new_rule|
         new_rule.duped_rule_id = original_rule.id
       })

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    hanuman (2.1.6)
+    hanuman (2.2.0)
       active_model_serializers (~> 0.8.1)
       acts-as-taggable-on (~> 4.0.0)
       amoeba (~> 3.1.0)
@@ -68,7 +68,7 @@ GEM
       activerecord (>= 4.0)
     amoeba (3.1.0)
       activerecord (>= 3.2.6)
-    ancestry (3.1.0)
+    ancestry (3.2.1)
       activerecord (>= 4.2.0)
     arel (6.0.4)
     ast (2.4.1)
@@ -171,7 +171,7 @@ GEM
     method_source (0.9.2)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2020.0512)
+    mime-types-data (3.2020.1104)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
@@ -226,7 +226,7 @@ GEM
       rake
     rake (13.0.1)
     redis (3.3.5)
-    redis-namespace (1.7.0)
+    redis-namespace (1.8.0)
       redis (>= 3.0.4)
     request_store (1.5.0)
       rack (>= 1.4)
@@ -298,7 +298,7 @@ GEM
     thor (1.0.1)
     thread_safe (0.3.6)
     tilt (1.4.1)
-    timers (4.3.0)
+    timers (4.3.2)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     uglifier (2.5.3)

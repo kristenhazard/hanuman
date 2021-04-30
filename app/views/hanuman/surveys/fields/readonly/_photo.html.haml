@@ -4,10 +4,13 @@
     - o.observation_photos.order(sort_order: :asc).each do |p|
       - photo_url = cloudinary_url(p.photo, :sign_url => true)
       - if photo_url.blank?
-        %p.form-control-static.bg-danger PHOTO NOT FOUND
-        = p.photo.my_public_id + "." + p.photo.format + " | this photo failed to upload successfully, please retry upload or remove"
-        %br
-        %br
+        - if o.survey.sync_uploading? || o.survey.sync_interrupted?
+          %p.form-control-static.bg-info{ style: "padding: 5px;"} This photo has not yet uploaded – the field user may have a poor internet connection.
+        - else
+          %p.form-control-static.bg-danger{ style: "padding: 5px;"} PHOTO NOT FOUND
+          = p.photo.my_public_id + "." + p.photo.format + " | this photo failed to upload successfully, please retry upload or remove"
+          %br
+          %br
       - else
         = link_to cl_image_tag(p.photo, :crop => :fill, :width => 350, :sign_url => true), cloudinary_url(p.photo, :sign_url => true), html_options = {"data-gallery" => "", class: "gallery-item gallery-photo", id: "photo_" + p.id.to_s, :"data-content-type" => p.photo.resource_type, :"data-download-url" => cloudinary_url(p.photo, :sign_url => true), :"data-file-name" => p.photo.public_id}
         = link_to p.photo.my_public_id + "." + p.photo.format + " | download file", cloudinary_url(p.photo, attachment: true, :sign_url => true), html_options = { download: true }

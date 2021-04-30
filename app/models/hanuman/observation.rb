@@ -3,12 +3,12 @@ module Hanuman
     has_paper_trail
 
     # Relations
-    belongs_to :survey#, touch: true -kdh removing touch to we don't update surveys table everytime the observations table is updated
+    belongs_to :survey, -> { unscoped }#, touch: true -kdh removing touch to we don't update surveys table everytime the observations table is updated
     belongs_to :question
     belongs_to :selectable, polymorphic: true
     has_many :observation_answers, dependent: :destroy
     accepts_nested_attributes_for :observation_answers, allow_destroy: true
-    has_many :answer_choices, through: :observation_answers
+    has_many :answer_choices, through: :observation_answers, before_remove: :generate_observation_answer_delta
     belongs_to :answer_choice
 
     has_many :observation_photos, dependent: :destroy
@@ -61,6 +61,9 @@ module Hanuman
       exclude_associations :documents
       exclude_associations :observation_signature
       exclude_associations :signature
+      exclude_associations :deltas
+      nullify :uuid
+      nullify :survey_uuid
     end
 
     def hide_tree!
@@ -131,6 +134,18 @@ module Hanuman
         return Hanuman::Observation.where(id: o_ids)
       else
         nil
+      end
+    end
+
+    # triggered on before_remove
+    # Needed to generate ObservationAnswer deletion deltas when multiselectable answer choices and taxonomy are unselected
+    def generate_observation_answer_delta(option)
+      if self.observation_answers.present?
+        self.observation_answers.each do |oa|
+          if (option.is_a?(Hanuman::AnswerChoice) && oa.answer_choice_id == option.id) || (option.is_a?(Taxon) && oa.multiselectable_id == option.id)
+            oa.generate_deletion_delta
+          end
+        end
       end
     end
 
