@@ -86,10 +86,6 @@ $(document).ready(function(){
       resetMapButtons($clonedContainer);
     },500)
 
-    // bind ConditionalLogic and re-run the logic to hide and show
-    cl = new ConditionalLogic;
-    cl.findRules(false);
-
     // unbind and rebind the pickers
     $(".datepicker").unbind().datepicker();
     $(".timepicki").unbind().timepicki({
@@ -135,35 +131,14 @@ $(document).ready(function(){
       maxPhotos = $(self).find('#max-photos').attr("data-max-photos");
       if (maxPhotos) {
         addedPhotos = $(self).find('.gallery-item').find("img").length;
+        console.log(maxPhotos + ' ' + addedPhotos);
+        checkMaxPhotos(this, maxPhotos, addedPhotos);
       }
-      console.log(maxPhotos + ' ' + addedPhotos);
-      checkMaxPhotos(this, maxPhotos, addedPhotos);
     });
 
-    // $('.file-upload').on('click', function (e) {
-    //   console.log("clicked");
-    //   maxPhotos = $(this).find('#max-photos').attr("data-max-photos");
-    //   if (maxPhotos) {
-    //     $(this).bind('cloudinarydone', function (e) {
-    //       addedPhotos = $(this).find('.photo-preview').find("img").length;
-    //       checkMaxPhotos(this, maxPhotos, addedPhotos);
-    //     });
-    //   }
-    // });
-
-    // $('.file-upload').on('click', '.remove-upload, .delete-saved-file', function(e) {
-    //   maxPhotos = $(this).parents('.file-upload').find('#max-photos').attr("data-max-photos");
-    //   if(maxPhotos) {
-    //     e.preventDefault();
-    //     self = $(this).parents('.file-upload');
-    //     setTimeout(function() {
-    //       addedPhotos = $(self).find('.photo-preview').find("img").length;
-    //       checkMaxPhotos(self, maxPhotos, addedPhotos)
-    //     }, 100);
-    //   }
-    // });
-
-
+    // bind ConditionalLogic and re-run the logic to hide and show
+    cl = new ConditionalLogic;
+    cl.findRules($clonedContainer);
   });
 
   
@@ -383,17 +358,16 @@ $(document).ready(function(){
         var projectId = window.location.pathname.match(/\/projects\/(\d+)/)[1];
         var surveyId = window.location.pathname.match(/\/surveys\/(\d+)/)[1];
         $.ajax({
-          url: "/projects/" + projectId + "/hanuman/surveys/" + surveyId + "/repeater_observation/" + dataObservationId + "/repeater/"+ repeaterId,
+          url: "/projects/" + projectId + "/hanuman/surveys/" + surveyId + "/repeater_observation/" + dataObservationId + "/repeater/" + repeaterId,
           method: "Delete"
-        }).done(function(response) {
+        }).done(function (response) {
           removeObservationFromDom(that);
         });
-      }else{
+      } else {
         removeObservationFromDom(that);
       }
     }
 
-    updateRepeaterControls();
     return false;
   });
 
@@ -410,7 +384,9 @@ $(document).ready(function(){
       2000,
       function() {
           $removeContainer.remove();
-          updateRepeaterControls()
+          updateRepeaterControls();
+          cl = new ConditionalLogic;
+          cl.findRules(null);
       }
     );
   };

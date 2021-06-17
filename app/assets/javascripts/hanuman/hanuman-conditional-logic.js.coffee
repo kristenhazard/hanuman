@@ -4,7 +4,7 @@ class @ConditionalLogic
   self.boundElements = []
 
   #scan page and find all objects with conditional logic rules
-  findRules: (runCalcs) ->
+  findRules: ($repeaterContainer) ->
     self.allowCascade = false
     problemWithCL = false
     $("[data-rule!=''][data-rule]").each ->
@@ -14,6 +14,11 @@ class @ConditionalLogic
       $(rules).each ->
         rule = this
         matchType = rule.match_type
+
+        shouldRunRepeaterCalcs = false
+
+        if $repeaterContainer != null && $repeaterContainer[0].contains($ruleContainer[0])
+          shouldRunRepeaterCalcs = true
 
         $(rule.conditions).each ->
           conditionQuestionId = this.question_id
@@ -38,9 +43,14 @@ class @ConditionalLogic
           if $conditionElement.length == 0 && rule.type != 'Hanuman::CalculationRule'
             problemWithCL = true
 
+          if $repeaterContainer != null && !shouldRunRepeaterCalcs
+            $conditionElement.each ->
+              if $repeaterContainer[0].contains(this)
+                shouldRunRepeaterCalcs = true
+                return
+
           # deal with any condition, once we get a hide_questions = false then we dont need to run through the rules
           hideQuestions = self.setHideQuestions(this, $conditionElement)
-
 
           ancestorId = rule.question_id
           # bind conditions based on element type
@@ -70,7 +80,7 @@ class @ConditionalLogic
           if rule.type != "Hanuman::CalculationRule"
             self.checkConditionsAndHideShow(rule.conditions, ancestorId, $ruleContainer, $ruleContainer, inRepeater, matchType, rule, true)
 
-        if runCalcs && rule.type == "Hanuman::CalculationRule"
+        if rule.type == "Hanuman::CalculationRule" && ($repeaterContainer == null || shouldRunRepeaterCalcs)
           self.updateCalculation(rule, $ruleContainer)
 
           # need the direct returns so that the nested loops don't get broken when they're compiled to JS
@@ -91,12 +101,12 @@ class @ConditionalLogic
   bindConditions: ($triggerElement, rule, $ruleContainer, conditionId) ->
 
     ## Don't double-bind calculations
-    ## We need to store the element, condition, and rule in order to not to exclude any necessary bindings
+    ## We need to store the parameter element, calculated element, condition, and rule in order to not to exclude any necessary bindings
     if rule.type == "Hanuman::CalculationRule"
       idx = self.boundElements.findIndex (el) ->
-        return $triggerElement[0] == el[0] && conditionId == el[1] && rule.id == el[2]
+        return $triggerElement[0] == el[0] && conditionId == el[1] && rule.id == el[2] && $ruleContainer[0] == el[3]
       return if idx != -1
-      self.boundElements.push([$triggerElement[0], conditionId, rule.id])
+      self.boundElements.push([$triggerElement[0], conditionId, rule.id, $ruleContainer[0]])
 
     $triggerElement.on "change", ->
       ## If this is a calculation rule, we don't care about conditional logic, we just want to re-run the calculations since a value has changed
@@ -622,4 +632,4 @@ $ ->
   if $('input#survey_survey_template_id').length
     #call findRules on document ready
     cl = new ConditionalLogic
-    cl.findRules(false)
+    cl.findRules(null)
