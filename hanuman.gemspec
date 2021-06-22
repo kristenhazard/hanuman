@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'haml-rails', '~> 0.5.3'
   s.add_dependency 'coffee-rails', '~> 4.0.1'
   s.add_dependency 'sass-rails', '~> 4.0.3'
-  s.add_dependency 'uglifier', '~> 2.5.3'
+  s.add_dependency 'uglifier', '~> 2.7.2'
   s.add_dependency 'modernizr-rails', '~> 2.7.1'
   s.add_dependency 'jquery-rails', '~> 3.1.1'
   s.add_dependency 'ember-cli-rails', '~> 0.10.0'
