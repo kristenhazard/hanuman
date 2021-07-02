@@ -52,6 +52,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'factory_bot_rails', '~> 4.11.1'
   s.add_development_dependency "fakeweb", "~> 1.3"
   s.add_development_dependency "faker", "~> 1.6.5"
-  s.add_development_dependency "rubocop", "~> 0.40.0"
+  s.add_development_dependency "rubocop", "~> 0.93.1"
   s.add_development_dependency "codeclimate-test-reporter", "~> 0.5.1"
 end
